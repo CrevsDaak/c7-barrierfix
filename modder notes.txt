@@ -1,0 +1,30 @@
+Blade barrier (uses sppr603d):
+
+dwsp603
+dwsp698
+spin143
+sppr603
+sppr698
+
+
+Smellyssan blade barrier (uses melis02b):
+
+melis02
+
+
+Globe of blades (uses sppr725d):
+
+dwsc116
+spcl116
+sppr725
+
+
+Circle of bones (uses sppr324d):
+
+dwsp324
+sppr324
+
+
+will end up being unused due to this mod:
+
+sppr324d.eff
