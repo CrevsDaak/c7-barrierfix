@@ -1,7 +1,7 @@
 BACKUP "weidu_external/backup/c7-barrierfix"
 AUTHOR "crevs.daak@gmail.com"
 
-VERSION v1.0
+VERSION v1.1
 
 /*
  * This little mod does one thing: stop Blade Barrier from instagibbing.
@@ -14,6 +14,20 @@ VERSION v1.0
  * I think I might be adding an extra proc of BB at 1s, but it should still be fine, as the spell is now finally balanced.
  *
  */
+
+
+/*
+      LPF ADD_SPELL_EFFECT
+        INT_VAR
+          opcode = 206
+          target = 1
+          resist_dispel = 3
+          parameter1 = RESOLVE_STR_REF(@206)
+          duration = 62
+        STR_VAR
+          resource = EVAL "%spell%"
+      END
+*/
 
 
 LANGUAGE
@@ -44,16 +58,6 @@ ACTION_FOR_EACH spell IN dwsp603 dwsp698 spin143 sppr603 sppr698 BEGIN
             resource = "sppr603d"
         END
       END
-      LPF ADD_SPELL_EFFECT
-        INT_VAR
-          opcode = 206
-          target = 1
-          resist_dispel = 3
-          parameter1 = RESOLVE_STR_REF(@206)
-          duration = 62
-        STR_VAR
-          resource = EVAL "%spell%"
-      END
     BUT_ONLY
   END
 END
@@ -74,16 +78,6 @@ ACTION_IF FILE_EXISTS_IN_GAME melis02.spl BEGIN
         STR_VAR
           resource = "melis02b"
       END
-    END
-    LPF ADD_SPELL_EFFECT
-      INT_VAR
-        opcode = 206
-        target = 1
-        resist_dispel = 3
-        parameter1 = RESOLVE_STR_REF(@206)
-        duration = 62
-      STR_VAR
-        resource = "melis02"
     END
   BUT_ONLY
 END
@@ -106,16 +100,6 @@ ACTION_FOR_EACH spell IN dwsc116 spcl116 sppr725 BEGIN
             resource = "sppr725d"
         END
       END
-      LPF ADD_SPELL_EFFECT
-        INT_VAR
-          opcode = 206
-          target = 1
-          resist_dispel = 3
-          parameter1 = RESOLVE_STR_REF(@206)
-          duration = 62
-        STR_VAR
-          resource = EVAL "%spell%"
-      END
     BUT_ONLY
   END
 END
@@ -125,6 +109,7 @@ ACTION_FOR_EACH spell IN dwsp324 sppr324 BEGIN
   ACTION_IF FILE_EXISTS_IN_GAME ~%spell%.spl~ BEGIN
     COPY_EXISTING "%spell%.spl" override
       LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 177 END
+      LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = 206 END
       FOR (startn=1; startn<17; startn+=1) BEGIN // header loop
         FOR (i = startn; i<17; i+=1) BEGIN // min level limiting header loop
           FOR (j= startn < 2 ? startn - 1: startn + 3; j<startn+4; j+=1) BEGIN // duration loop
