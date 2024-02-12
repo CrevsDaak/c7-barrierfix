@@ -1,7 +1,7 @@
-BACKUP "weidu_external/backup/c7-barrierfix"
-AUTHOR "crevs.daak@gmail.com"
 
-VERSION v1.1
+
+// fix_barrier_et_al.tpa
+// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_barrier_et_al.tpa, 2024-02-12 Monday 17:20:59 nico>
 
 /*
  * This little mod does one thing: stop Blade Barrier from instagibbing.
@@ -28,17 +28,6 @@ VERSION v1.1
           resource = EVAL "%spell%"
       END
 */
-
-
-LANGUAGE
-  English
-  english
-  "c7barrierfix/lang/english.tra"
-
-
-BEGIN @100 DESIGNATED 100
-REQUIRE_PREDICATE ENGINE_IS tob @110
-LABEL ~c7_barrier_fix~
 
 // blade barrier
 ACTION_FOR_EACH spell IN dwsp603 dwsp698 spin143 sppr603 sppr698 BEGIN

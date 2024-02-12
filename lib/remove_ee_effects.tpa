@@ -1,0 +1,105 @@
+
+// remove_ee_effects.tph
+// Time-stamp: </Users/nico/BG_modding/c7-fxfix/lib/remove_ee_effects.tph, 2024-02-05 Monday 00:01:08 nico>
+
+ACTION_TIME remove_ee_effects BEGIN
+  WITH_SCOPE BEGIN
+    COPY_EXISTING_REGEXP ~^.+\.itm$~ override
+      PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+        GET_OFFSET_ARRAY ab_array ITM_V10_HEADERS
+        PHP_EACH ab_array AS int => ab_off BEGIN
+          GET_OFFSET_ARRAY2 fx_array ab_off ITM_V10_HEAD_EFFECTS
+          PHP_EACH fx_array AS int => fx_off BEGIN
+            READ_SHORT fx_off fx_type
+            PATCH_IF fx_type == 318 BEGIN
+              READ_SHORT (fx_off + 0x8) lowpara2
+              PATCH_IF lowpara2 < 387 BEGIN
+                TEXT_SPRINT $removelist("%fx_type%") 1
+              END
+            END ELSE PATCH_IF fx_type > 318 BEGIN
+              TEXT_SPRINT $removelist("%fx_type%") 1
+            END
+          END
+        END
+        PHP_EACH removelist AS op => remove BEGIN
+          PATCH_IF remove BEGIN
+            LPF DELETE_ITEM_EFFECT INT_VAR opcode_to_delete = op END
+          END
+        END
+        CLEAR_ARRAY removelist
+      END
+    BUT_ONLY
+
+    COPY_EXISTING_REGEXP ~^.+\.spl$~ override
+      PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+        GET_OFFSET_ARRAY ab_array SPL_V10_HEADERS
+        PHP_EACH ab_array AS int => ab_off BEGIN
+          GET_OFFSET_ARRAY2 fx_array ab_off SPL_V10_HEAD_EFFECTS
+          PHP_EACH fx_array AS int => fx_off BEGIN
+            READ_SHORT fx_off fx_type
+            PATCH_IF fx_type == 318 BEGIN
+              READ_SHORT (fx_off + 0x8) lowpara2
+              PATCH_IF lowpara2 < 387 BEGIN
+                TEXT_SPRINT $removelist("%fx_type%") 1
+              END
+            END ELSE PATCH_IF fx_type > 318 BEGIN
+              TEXT_SPRINT $removelist("%fx_type%") 1
+            END
+          END
+        END
+        PHP_EACH removelist AS op => remove BEGIN
+          PATCH_IF remove BEGIN
+            LPF DELETE_SPELL_EFFECT INT_VAR opcode_to_delete = op END
+          END
+        END
+        CLEAR_ARRAY removelist
+      END
+    BUT_ONLY
+
+    ACTION_FOR_EACH ext IN spl itm BEGIN
+      COPY_EXISTING_REGEXP ~^.+\.%ext%$~ override
+        PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+          GET_OFFSET_ARRAY fx_array ITM_V10_GEN_EFFECTS
+          PHP_EACH fx_array AS int => fx_off BEGIN
+            PATCH_IF fx_type == 318 BEGIN
+              READ_SHORT (fx_off + 0x8) lowpara2
+              PATCH_IF lowpara2 < 387 BEGIN
+                TEXT_SPRINT $removelist("%fx_type%") 1
+              END
+            END ELSE PATCH_IF fx_type > 318 BEGIN
+              TEXT_SPRINT $removelist("%fx_type%") 1
+            END
+          END
+          PHP_EACH removelist AS op => remove BEGIN
+            PATCH_IF remove BEGIN
+              LPF DELETE_EFFECT INT_VAR match_opcode = op END
+            END
+          END
+          CLEAR_ARRAY removelist
+        END
+      BUT_ONLY
+    END
+
+    COPY_EXISTING_REGEXP ~^.+\.cre$~ override
+      PATCH_IF SOURCE_SIZE >= 0x2d4 BEGIN
+        GET_OFFSET_ARRAY fx_array CRE_V10_EFFECTS
+        PHP_EACH fx_array AS int => fx_off BEGIN
+          PATCH_IF fx_type == 318 BEGIN
+            READ_SHORT (fx_off + 0x8) lowpara2
+            PATCH_IF lowpara2 < 387 BEGIN
+              TEXT_SPRINT $removelist("%fx_type%") 1
+            END
+          END ELSE PATCH_IF fx_type > 318 BEGIN
+            TEXT_SPRINT $removelist("%fx_type%") 1
+          END
+        END
+        PHP_EACH removelist AS op => remove BEGIN
+          PATCH_IF remove BEGIN
+            LPF DELETE_EFFECT INT_VAR match_opcode = op END
+          END
+        END
+        CLEAR_ARRAY removelist
+      END
+    BUT_ONLY
+  END
+END

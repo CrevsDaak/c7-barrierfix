@@ -1,3 +1,4 @@
 @100 = ~Fix Blade Barrier et al applying infinite damage if the game is paused on the same frame~
 @110 = ~This issue only occurs on the ToB engine.~
-@206 = ~You cannot cast this spell until the current casting has run out.~
+@200 = ~Check for and remove EE or otherwise invalid opcodes from items and spells~
+@210 = ~This fixer assumes and requires BG2:ToB and ToBEx.~

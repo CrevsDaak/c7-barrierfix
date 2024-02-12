@@ -1,0 +1,24 @@
+BACKUP "weidu_external/backup/c7-fixpack"
+AUTHOR "crevs.daak@gmail.com"
+
+VERSION v1.2
+
+LANGUAGE
+  English
+  english
+  "c7-fixpack/lang/english.tra"
+
+
+BEGIN @100 DESIGNATED 100
+REQUIRE_PREDICATE ENGINE_IS tob @110
+LABEL ~c7_barrier_fix~
+
+INCLUDE "%MOD_FOLDER%/lib/fix_barrier_et_al.tpa"
+
+BEGIN @200 DESIGNATED 200
+REQUIRE_PREDICATE FILE_EXISTS ~./tobex.dll~ && ENGINE_IS tob @210
+LABEL ~c7_effects_fix~
+
+INCLUDE "%MOD_FOLDER%/lib/remove_ee_effects.tpa"
+
+// eof
