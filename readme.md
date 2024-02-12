@@ -1,4 +1,4 @@
-Crevs' BG2:ToB impressivelly small Fixpack
+Crevs' BG2:ToB impressively small Fixpack
 =================================
 
 I've created this fixpack to put together the two small fixes that I currently use (though the second one might only be situationally necessary) for my own BGT installs.
