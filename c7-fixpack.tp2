@@ -1,7 +1,7 @@
 BACKUP "weidu_external/backup/c7-fixpack"
 AUTHOR "crevs.daak@gmail.com"
 
-VERSION v1.2
+VERSION "v1.2"
 
 LANGUAGE
   English
