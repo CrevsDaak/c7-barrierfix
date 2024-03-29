@@ -1,7 +1,7 @@
 BACKUP "weidu_external/backup/c7-fixpack"
 AUTHOR "crevs.daak@gmail.com"
 
-VERSION "v1.2"
+VERSION "v1.3"
 
 LANGUAGE
   English
@@ -20,5 +20,11 @@ REQUIRE_PREDICATE FILE_EXISTS ~./tobex.dll~ && ENGINE_IS tob @210
 LABEL ~c7_effects_fix~
 
 INCLUDE "%MOD_FOLDER%/lib/remove_ee_effects.tpa"
+
+BEGIN @300 DESIGNATED 300
+REQUIRE_PREDICATE !ENGINE_IS ~totsc bg1 pst~ @310
+LABEL ~c7_fireshield_fix~
+
+INCLUDE "%MOD_FOLDER%/lib/fix_all_fireshields.tpa"
 
 // eof

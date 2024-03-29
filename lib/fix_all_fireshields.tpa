@@ -1,0 +1,131 @@
+
+// fix_all_fireshields.tpa
+// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_all_fireshields.tpa, 2024-03-29 Friday 15:39:08 nico>
+
+ACTION_TIME fix_fireshields BEGIN
+  WITH_SCOPE BEGIN
+    OUTER_SET $format("spl") = 0x28
+    OUTER_SET $format("itm") = 0x38
+    ACTION_PHP_EACH format AS ext => head_size BEGIN
+      COPY_EXISTING_REGEXP ~^.+\.%ext%$~ override
+        PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+          GET_OFFSET_ARRAY ab_array 0x64 4 0x68 2 0 0 head_size
+          PHP_EACH ab_array AS int => ab_off BEGIN
+            GET_OFFSET_ARRAY2 fx_array ab_off ITM_V10_HEAD_EFFECTS
+            PHP_EACH fx_array AS int => fx_off BEGIN
+              PATCH_IF (SHORT_AT fx_off) == 177 BEGIN
+                TEXT_SPRINT current_base_spl "%SOURCE_RES%"
+                READ_LONG  (fx_off + 0x4) param1
+                READ_LONG  (fx_off + 0x8) param2
+                READ_ASCII (fx_off + 0x14) resref
+                PATCH_IF param1 == 0 && param2 == 2 && FILE_EXISTS_IN_GAME "%resref%.eff" BEGIN
+                  INNER_PATCH_FILE "%resref%.eff" BEGIN
+                    PATCH_IF SOURCE_SIZE >= 0xd4 BEGIN
+                      READ_LONG 0x10 eff_opcode
+                      READ_LONG 0x14 eff_target
+                      READ_LONG 0x1c eff_param1
+                      READ_LONG 0x20 eff_param2
+                      READ_ASCII 0x30 eff_resref
+                      PATCH_IF eff_opcode == 232 && eff_param1 == 1 && eff_param2 == 0 && eff_target == 1 && FILE_EXISTS_IN_GAME "%eff_resref%.spl" BEGIN
+                        INNER_PATCH_FILE "%eff_resref%.spl" BEGIN
+                          PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+                            GET_OFFSET_ARRAY sec_ab_array SPL_V10_HEADERS
+                            PHP_EACH sec_ab_array AS int => sec_ab_off BEGIN
+                              GET_OFFSET_ARRAY2 sec_fx_array sec_ab_off SPL_V10_HEAD_EFFECTS
+                              PHP_EACH sec_fx_array AS int => sec_fx_off BEGIN
+                                PATCH_IF (SHORT_AT sec_fx_off) == 12 BEGIN
+                                  TO_LOWER eff_resref
+                                  TEXT_SPRINT $fireshield("%eff_resref%") "%eff_resref%"
+                                END
+                              END
+                            END
+                          END
+                        END
+                      END
+                    END
+                  END
+                END
+              END ELSE PATCH_IF (SHORT_AT fx_off) == 232 BEGIN
+                TEXT_SPRINT current_base_spl "%SOURCE_RES%"
+                READ_BYTE  (fx_off + 0x2) head_target
+                READ_LONG  (fx_off + 0x4) head_param1
+                READ_LONG  (fx_off + 0x8) head_param2
+                READ_ASCII (fx_off + 0x14) head_resref
+                PATCH_IF head_param1 == 1 && head_param2 == 0 && head_target == 1 && FILE_EXISTS_IN_GAME "%head_resref%.spl" BEGIN
+                  INNER_PATCH_FILE "%head_resref%.spl" BEGIN
+                    PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+                      GET_OFFSET_ARRAY head_sec_ab_array SPL_V10_HEADERS
+                      PHP_EACH head_sec_ab_array AS int => head_sec_ab_off BEGIN
+                        GET_OFFSET_ARRAY2 head_sec_fx_array head_sec_ab_off SPL_V10_HEAD_EFFECTS
+                        PHP_EACH head_sec_fx_array AS int => head_sec_fx_off BEGIN
+                          PATCH_IF (SHORT_AT head_sec_fx_off) == 12 BEGIN
+                            TO_LOWER head_resref
+                            TEXT_SPRINT $fireshield("%head_resref%") "%head_resref%"
+                          END
+                        END
+                      END
+                    END
+                  END
+                END
+              END
+            END
+          END
+          GET_OFFSET_ARRAY gen_fx_array ITM_V10_GEN_EFFECTS
+          PHP_EACH gen_fx_array AS int => gen_fx_off BEGIN
+            PATCH_IF (SHORT_AT gen_fx_off) == 232 BEGIN
+              READ_LONG  (gen_fx_off + 0x4) gen_param1
+              READ_LONG  (gen_fx_off + 0x8) gen_param2
+              READ_ASCII (gen_fx_off + 0x14) gen_resref
+              PATCH_IF gen_param1 == 1 && gen_param2 == 0 && FILE_EXISTS_IN_GAME "%gen_resref%.spl" BEGIN
+                INNER_PATCH_FILE "%gen_resref%.spl" BEGIN
+                  PATCH_IF SOURCE_SIZE > 0x71 BEGIN
+                    GET_OFFSET_ARRAY gen_sec_ab_array SPL_V10_HEADERS
+                    PHP_EACH gen_sec_ab_array AS int => gen_sec_ab_off BEGIN
+                      GET_OFFSET_ARRAY2 gen_sec_fx_array gen_sec_ab_off SPL_V10_HEAD_EFFECTS
+                      PHP_EACH gen_sec_fx_array AS int => gen_sec_fx_off BEGIN
+                        PATCH_IF (SHORT_AT gen_sec_fx_off) == 12 BEGIN
+                          TO_LOWER gen_resref
+                          TEXT_SPRINT $fireshield("%gen_resref%") "%gen_resref%"
+                        END
+                      END
+                    END
+                  END
+                END
+              END
+            END
+          END
+        END
+      BUT_ONLY
+    END
+
+    ACTION_PHP_EACH fireshield AS discard => spell BEGIN
+      COPY_EXISTING "%spell%.spl" override
+        PHP_EACH fireshield AS discard => patch_immunity BEGIN
+          PATCH_IF "%spell%" STR_CMP "%patch_immunity%" BEGIN
+            LPF ADD_SPELL_EFFECT
+              INT_VAR
+                opcode = 206
+                target = 1
+                parameter1 = "-1"
+                duration = 2
+                timing = 10
+              STR_VAR
+                resource = EVAL "%patch_immunity%"
+            END
+          END
+        END
+        // need to make sure this one's the very last one
+        LPF ADD_SPELL_EFFECT
+          INT_VAR
+            opcode = 206
+            parameter1 = "-1"
+            target = 1
+            duration = 2
+            timing = 10
+          STR_VAR
+            resource = EVAL "%spell%"
+        END
+      BUT_ONLY
+    END
+  END
+END

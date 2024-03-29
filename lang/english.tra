@@ -2,3 +2,5 @@
 @110 = ~This issue only occurs on the ToB engine.~
 @200 = ~Check for and remove EE or otherwise invalid opcodes from items and spells~
 @210 = ~This fixer assumes and requires BG2:ToB and ToBEx.~
+@300 = ~Fix all possible instances of Fireshield damage loops~
+@310 = ~This fix cannot be applied if BG2 opcode 206 is not present.~
