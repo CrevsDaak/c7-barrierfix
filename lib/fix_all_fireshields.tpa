@@ -1,6 +1,6 @@
 
 // fix_all_fireshields.tpa
-// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_all_fireshields.tpa, 2024-03-29 Friday 15:39:08 nico>
+// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_all_fireshields.tpa, 2024-03-29 Friday 15:42:08 nico>
 
 ACTION_TIME fix_fireshields BEGIN
   WITH_SCOPE BEGIN
@@ -100,6 +100,7 @@ ACTION_TIME fix_fireshields BEGIN
 
     ACTION_PHP_EACH fireshield AS discard => spell BEGIN
       COPY_EXISTING "%spell%.spl" override
+        
         PHP_EACH fireshield AS discard => patch_immunity BEGIN
           PATCH_IF "%spell%" STR_CMP "%patch_immunity%" BEGIN
             LPF ADD_SPELL_EFFECT
