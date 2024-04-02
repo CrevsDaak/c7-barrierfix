@@ -1,13 +1,13 @@
 
 // fix_all_fireshields.tpa
-// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_all_fireshields.tpa, 2024-03-29 Friday 15:57:45 nico>
+// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_all_fireshields.tpa, 2024-04-02 Tuesday 18:48:07 nico>
 
 ACTION_TIME fix_fireshields BEGIN
   WITH_SCOPE BEGIN
     OUTER_SET $format("spl") = 0x28
     OUTER_SET $format("itm") = 0x38
     ACTION_PHP_EACH format AS ext => head_size BEGIN
-      COPY_EXISTING_REGEXP ~^.+\.%ext%$~ override
+      COPY_EXISTING_REGEXP - ~^.+\.%ext%$~ override
         PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
           GET_OFFSET_ARRAY ab_array 0x64 4 0x68 2 0 0 head_size
           PHP_EACH ab_array AS int => ab_off BEGIN
@@ -97,6 +97,33 @@ ACTION_TIME fix_fireshields BEGIN
         END
       BUT_ONLY
     END
+
+    // check ALL eff files, even if they aren't used via the methods we check
+    COPY_EXISTING_REGEXP - "^.+\.eff$" override
+      PATCH_IF SOURCE_SIZE >= 0xd4 BEGIN
+        READ_LONG 0x10 eff_opcode
+        READ_LONG 0x14 eff_target
+        READ_LONG 0x1c eff_param1
+        READ_LONG 0x20 eff_param2
+        READ_ASCII 0x30 eff_resref
+        PATCH_IF eff_opcode == 232 && eff_param1 == 1 && eff_param2 == 0 && eff_target == 1 && FILE_EXISTS_IN_GAME "%eff_resref%.spl" BEGIN
+          INNER_PATCH_FILE "%eff_resref%.spl" BEGIN
+            PATCH_IF SOURCE_SIZE >= 0x72 BEGIN
+              GET_OFFSET_ARRAY sec_ab_array SPL_V10_HEADERS
+              PHP_EACH sec_ab_array AS int => sec_ab_off BEGIN
+                GET_OFFSET_ARRAY2 sec_fx_array sec_ab_off SPL_V10_HEAD_EFFECTS
+                PHP_EACH sec_fx_array AS int => sec_fx_off BEGIN
+                  PATCH_IF (SHORT_AT sec_fx_off) == 12 BEGIN
+                    TO_LOWER eff_resref
+                    TEXT_SPRINT $fireshield("%eff_resref%") "%eff_resref%"
+                  END
+                END
+              END
+            END
+          END
+        END
+      END
+    BUT_ONLY
 
     ACTION_PHP_EACH fireshield AS discard => spell BEGIN
       COPY_EXISTING "%spell%.spl" override
