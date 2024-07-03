@@ -1,7 +1,7 @@
 
 
 // fix_barrier_et_al.tpa
-// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_barrier_et_al.tpa, 2024-06-29 Saturday 23:32:00 nico>
+// Time-stamp: </Users/nico/BG_modding/c7-fixpack/lib/fix_barrier_et_al.tpa, 2024-07-03 Wednesday 20:22:59 nico>
 
 /*
  * This little mod does one thing: stop Blade Barrier from instagibbing.
@@ -141,8 +141,6 @@ ACTION_FOR_EACH barrierd IN sppr324d sppr725d melis02b sppr603d BEGIN
           opcode = 206
           target = 2
           timing = 10
-          duration = 2
-          resist_dispel = 2
         STR_VAR
           resource = EVAL "%barrierd%"
       END
